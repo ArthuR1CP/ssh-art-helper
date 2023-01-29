@@ -1,4 +1,8 @@
 import paramiko
+import logging
+import contextlib
+
+logging.basicConfig(level=logging.INFO)
 
 
 def populate_hosts(inventory):
@@ -8,6 +12,12 @@ def populate_hosts(inventory):
             host  = host.rstrip("\n")
             hosts_list.append(host)
     return hosts_list
+
+
+def run_command(client, command):
+    with contextlib.closing(client.invoke_shell()) as channel:
+        channel.exec_command(command)
+        return channel.recv(1024).decode()
 
 def command(client):
     stdin, stdout, stderr = client.exec_command('hostname')
@@ -28,8 +38,13 @@ if __name__ == "__main__":
     password = ''
 
     for host in hosts:
-        client.connect(hostname=host, username=username, key_filename=key_filename) # you can use password inseat key_filename
-        command(client)
-        command2(client)
-        client.close()
-
+        try:
+            client.connect(hostname=host, username=username, key_filename=key_filename)
+            cmd_hostname = run_command(client, 'hostname')
+            cmd_date = run_command(client, 'date')
+            logging.info(f'hostname: {cmd_hostname}')
+            logging.info(f'date: {cmd_date}')
+        except Exception as e:
+            logging.error(f'An error occurred: {e}')
+        finally:
+            client.close()
