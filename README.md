@@ -30,7 +30,7 @@ Before using SSH Helper, ensure you have the following:
 1. Clone the repository to your local machine:
 
    ```shell
-   git clone https://github.com/your-username/ssh-helper.git
+   git clone  https://github.com/ArthuR1CP/ssh-art-helper.git
    ```
 
 2. Install the Paramiko library if you haven't already:
